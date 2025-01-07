@@ -3,9 +3,9 @@ import requests
 import base64
 
 # 替換為您的 Shodan 和 FOFA API 密鑰
-SHODAN_API_KEY = ''
-FOFA_EMAIL = ''
-FOFA_API_KEY = ''
+SHODAN_API_KEY = 'sIgqjOT5OOzukCqJY5OcUOcoQVnfhJqG'
+FOFA_EMAIL = 'angrypanda22@protonmail.com'
+FOFA_API_KEY = 'd2d9adb64a84a3ec66d22c7a7f43d68a'
 
 # 初始化 Shodan 客戶端
 shodan_api = shodan.Shodan(SHODAN_API_KEY)
@@ -59,7 +59,7 @@ def fetch_shodan_results(ip):
 
 try:
     # 從文件讀取目標 IP
-    with open(target_file, 'r') as f:
+    with open(target_file, 'r', encoding='utf-8') as f:
         target_ips = [line.strip() for line in f if line.strip()]
 
     print(f"Loaded {len(target_ips)} target IPs from {target_file}")
@@ -75,7 +75,7 @@ try:
             final_rdp_ips.append(ip)
 
     # 保存最終結果
-    with open(output_file, 'w') as f:
+    with open(output_file, 'w', encoding='utf-8') as f:
         f.write("\n".join(final_rdp_ips))
     print(f"\nSaved {len(final_rdp_ips)} IPs with port 3389 open to {output_file}")
 
