@@ -3,9 +3,9 @@ import requests
 import base64
 
 # 替換為您的 Shodan 和 FOFA API 密鑰
-SHODAN_API_KEY = 'sIgqjOT5OOzukCqJY5OcUOcoQVnfhJqG'
-FOFA_EMAIL = 'angrypanda22@protonmail.com'
-FOFA_API_KEY = 'd2d9adb64a84a3ec66d22c7a7f43d68a'
+SHODAN_API_KEY = ''
+FOFA_EMAIL = ''
+FOFA_API_KEY = ''
 
 # 初始化 Shodan 客戶端
 shodan_api = shodan.Shodan(SHODAN_API_KEY)
