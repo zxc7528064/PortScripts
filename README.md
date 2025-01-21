@@ -10,4 +10,5 @@
 
 Use: 
 python script.py -ip 8.8.8.8
+
 python script.py -t ips.txt
