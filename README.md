@@ -6,7 +6,7 @@
 
 - Scan_Web_Shodan_API_Thread
 
-針對 IP 掃描 > 結果存在 DeBug/log.xlsx 內容包含 : 掃描時間、目標IP、HTTP 標題
+針對單個 IP 或多個掃描 > 結果存在 DeBug/log.xlsx，內容包含 : 掃描時間、目標IP、HTTP 標題。
 
 Use: 
 
