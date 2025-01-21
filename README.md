@@ -9,9 +9,3 @@
 - Scan_Web_Shodan_API_Thread
 
 針對單個 IP 或多個掃描 > 結果存在 DeBug/log.xlsx，內容包含 : 掃描時間、目標IP、HTTP 標題。
-
-Use: 
-
-python script.py -ip 8.8.8.8
-
-python script.py -t ips.txt
