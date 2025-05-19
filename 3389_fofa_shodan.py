@@ -2,25 +2,24 @@ import shodan
 import requests
 import base64
 
-# 替換為您的 Shodan 和 FOFA API 密鑰
+# === 你的 API Key（請自行替換） ===
 SHODAN_API_KEY = ''
 FOFA_EMAIL = ''
 FOFA_API_KEY = ''
 
-# 初始化 Shodan 客戶端
-shodan_api = shodan.Shodan(SHODAN_API_KEY)
-
-# 載入目標 IP 清單的文件名稱
+# === 檔案設定 ===
 target_file = 'target.txt'
-# 保存有開啟 3389 的 IP 的文件
 output_file = 'final_rdp.txt'
 
-# FOFA API 的基礎 URL
+# === FOFA 設定 ===
 FOFA_API_URL = 'https://fofa.info/api/v1/search/all'
 
+# === 初始化 Shodan ===
+shodan_api = shodan.Shodan(SHODAN_API_KEY)
+
+# === FOFA 查詢 ===
 def fetch_fofa_results(ip):
-    """使用 FOFA API 搜索指定 IP 的 3389 端口"""
-    query = f'ip="{ip}" && port=3389'
+    query = f'ip="{ip}" && (port=3389 || port=33890)'
     query_base64 = base64.b64encode(query.encode('utf-8')).decode('utf-8')
     params = {
         'email': FOFA_EMAIL,
@@ -33,53 +32,57 @@ def fetch_fofa_results(ip):
         response.raise_for_status()
         data = response.json()
         if 'results' in data and data['results']:
-            print(f"[FOFA] {ip} has port 3389 open")
+            print(f"[🟢 FOFA] {ip} => 開啟 RDP (3389/33890)")
             return True
         else:
-            print(f"[FOFA] {ip} does not have port 3389 open")
+            print(f"[⚪ FOFA] {ip} => 未發現開放")
             return False
     except Exception as e:
-        print(f"Error fetching FOFA results for {ip}: {e}")
+        print(f"[❌ FOFA] {ip} 發生錯誤: {e}")
         return False
 
+# === SHODAN 查詢 ===
 def fetch_shodan_results(ip):
-    """使用 Shodan API 檢查指定 IP 的 3389 端口"""
     try:
-        print(f"Checking IP: {ip} via Shodan")
         host = shodan_api.host(ip)
-        if any(service['port'] == 3389 for service in host.get('data', [])):
-            print(f"[Shodan] {ip} has port 3389 open")
+        open_ports = [service['port'] for service in host.get('data', [])]
+        if 3389 in open_ports or 33890 in open_ports:
+            print(f"[🟢 SHODAN] {ip} => 開啟 RDP: {open_ports}")
             return True
         else:
-            print(f"[Shodan] {ip} does not have port 3389 open")
+            print(f"[⚪ SHODAN] {ip} => 未開放 RDP: {open_ports}")
             return False
     except shodan.APIError as e:
-        print(f"Error checking IP {ip} via Shodan: {e}")
+        print(f"[❌ SHODAN] {ip} 發生錯誤: {e}")
         return False
 
+# === 主程序 ===
 try:
-    # 從文件讀取目標 IP
     with open(target_file, 'r', encoding='utf-8') as f:
         target_ips = [line.strip() for line in f if line.strip()]
 
-    print(f"Loaded {len(target_ips)} target IPs from {target_file}")
+    print(f"📂 載入 {len(target_ips)} 筆目標 IP")
 
     final_rdp_ips = []
 
     for ip in target_ips:
-        print(f"\nChecking IP: {ip}")
+        print(f"\n🔍 正在檢查 IP: {ip}")
         fofa_open = fetch_fofa_results(ip)
         shodan_open = fetch_shodan_results(ip)
 
-        if fofa_open and shodan_open:
+        if fofa_open or shodan_open:
+            print(f"[✅ 命中] {ip} 被記錄下來")
             final_rdp_ips.append(ip)
+        else:
+            print(f"[❌ 跳過] {ip} 未發現 RDP 開放")
 
-    # 保存最終結果
+    # 寫入結果
     with open(output_file, 'w', encoding='utf-8') as f:
-        f.write("\n".join(final_rdp_ips))
-    print(f"\nSaved {len(final_rdp_ips)} IPs with port 3389 open to {output_file}")
+        f.write('\n'.join(final_rdp_ips))
+
+    print(f"\n✅ 共 {len(final_rdp_ips)} 筆 IP 被寫入：{output_file}")
 
 except FileNotFoundError:
-    print(f"Error: File {target_file} not found.")
+    print(f"[❌] 找不到檔案：{target_file}")
 except Exception as e:
-    print(f"An error occurred: {e}")
+    print(f"[❌] 發生未知錯誤：{e}")
