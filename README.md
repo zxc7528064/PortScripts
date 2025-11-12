@@ -1,5 +1,5 @@
 
-- checkrdp_fofa_shodan.py
+- check_rdp.py
 
 填入 Shodan / Fofa apikey 以及 Gmail，新建目標 targets.txt 與 3389_fofa_shodan.py 放在同一目錄下
 
